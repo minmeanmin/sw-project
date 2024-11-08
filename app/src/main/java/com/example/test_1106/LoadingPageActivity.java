@@ -1,6 +1,7 @@
 package com.example.test_1106;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -11,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,22 +20,30 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Objects;
 import java.util.UUID;
 
 public class LoadingPageActivity extends AppCompatActivity {
     private static final int REQUEST_BLUETOOTH_PERMISSIONS = 1;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private View backButton;
     private BluetoothAdapter bluetoothAdapter;
     private String targetDeviceName;
     private BluetoothDevice targetDevice;
+    private BluetoothSocket bluetoothSocket;
+    private InputStream inputStream;
+    private OutputStream outputStream;
     private boolean isDiscovering = false;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loading_page);
 
+        backButton = findViewById(R.id.backButtonInLoadingPage);
         targetDeviceName = Objects.requireNonNull(getIntent().getStringExtra("TRAY_ID")).trim();
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -43,18 +53,44 @@ public class LoadingPageActivity extends AppCompatActivity {
         } else {
             checkPermissionsAndRequest();
         }
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); // 현재 Activity를 종료하고 이전 화면으로 돌아감
+            }
+        });
     }
 
     private void checkPermissionsAndRequest() {
+        // 권한 상태 확인(권한 있으면 true, 없으면 false)
         boolean bluetoothPermissions = hasPermissions(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN);
         boolean locationPermission = hasPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !bluetoothPermissions) {
-            requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN});
-        } else if (!locationPermission) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
+        // 권한 요청 분기
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!bluetoothPermissions && !locationPermission) { // Android 12 이상 + Bluetooth와 위치 권한이 모두 없는 경우
+                requestPermissions(new String[]{
+                        Manifest.permission.BLUETOOTH_CONNECT,
+                        Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                });
+            } else if (!bluetoothPermissions) { // Android 12 이상 +  Bluetooth 권한만 없는 경우
+                requestPermissions(new String[]{
+                        Manifest.permission.BLUETOOTH_CONNECT,
+                        Manifest.permission.BLUETOOTH_SCAN
+                });
+            } else if (!locationPermission) { // Android 12 이상 + 위치 권한만 없는 경우
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
+            } else { // 모든 권한이 있는 경우
+                startBluetoothDiscovery();
+            }
         } else {
-            startBluetoothDiscovery();
+            if (!locationPermission) { // Android 12 미만: 위치 권한만 필요한 경우 요청
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
+            } else { // 모든 권한이 있는 경우
+                startBluetoothDiscovery();
+            }
         }
     }
 
@@ -108,10 +144,10 @@ public class LoadingPageActivity extends AppCompatActivity {
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) { // bluetooth 장치가 검색될 때
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE); // 발견된 장치 정보 추출
                 if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-                    if (device != null && targetDeviceName.equals(device.getName())) {
+                    if (device != null && targetDeviceName.equals(device.getName())) { // 목표 장치가 발견되었을 때 실행
                         targetDevice = device;
                         bluetoothAdapter.cancelDiscovery();
                         isDiscovering = false;
@@ -121,40 +157,72 @@ public class LoadingPageActivity extends AppCompatActivity {
                 } else {
                     requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT});
                 }
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()) && isDiscovering) {
+                // 검색 완료 시 검색이 이미 중단되지 않은 상태(isDiscovering이 true일 때)만 실행
                 isDiscovering = false;
-                showToast("장치 검색을 완료했습니다. 목표 장치를 찾지 못했거나 연결이 실패했습니다. 다시 시도해 주세요.");
+                showToast("목표 장치를 찾지 못했거나 연결이 실패했습니다. 다시 시도해 주세요.");
             }
         }
     };
 
+
     private void connectToDevice() {
         new Thread(() -> {
-            int retryCount = 0;
-            while (retryCount < 3) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-                    try (BluetoothSocket socket = targetDevice.createRfcommSocketToServiceRecord(MY_UUID)) {
-                        bluetoothAdapter.cancelDiscovery();
-                        socket.connect();
-                        runOnUiThread(() -> showToast("목표 장치와 성공적으로 연결되었습니다!"));
-                        runOnUiThread(() -> goToNextPage(socket));
-                        return;
-                    } catch (IOException e) {
-                        retryCount++;
-                        if (retryCount >= 3) showToast("목표 장치와 연결할 수 없습니다. Bluetooth를 확인한 후 다시 시도해 주세요.");
-                    }
-                } else {
+            try {
+                // 권한 확인
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT});
                     return;
                 }
+
+                // 소켓 생성 및 연결 시도
+                bluetoothSocket = targetDevice.createRfcommSocketToServiceRecord(MY_UUID);
+                bluetoothAdapter.cancelDiscovery();
+                bluetoothSocket.connect();
+
+                // 스트림 초기화
+                inputStream = bluetoothSocket.getInputStream();
+                outputStream = bluetoothSocket.getOutputStream();
+
+                // UI 업데이트 및 데이터 전송
+                runOnUiThread(() -> {
+                    showToast("목표 장치와 성공적으로 연결되었습니다!");
+                    sendDataToDevice("연결 성공"); // 연결 후 데이터 전송
+                    // TODO: 연결된 Device를 DB에 저장 or localStorage에 저장 (나중에 냉장고 트레이 선택 화면에서 선택하기 위해)
+                    Intent intent = new Intent(LoadingPageActivity.this, ConnectedPageActivity.class);
+                    startActivity(intent);
+                });
+
+            } catch (IOException e) {
+                // 예외 처리 및 소켓 닫기
+                runOnUiThread(() -> showToast("목표 장치와 연결할 수 없습니다. Bluetooth를 확인한 후 다시 시도해 주세요."));
+                closeSocket();
             }
         }).start();
     }
 
-    private void goToNextPage(BluetoothSocket socket) {
-        Intent intent = new Intent(LoadingPageActivity.this, ConnectedPageActivity.class);
-        startActivity(intent);
-        finish();
+    // 데이터 전송 메서드
+    private void sendDataToDevice(String data) {
+        if (outputStream != null) {
+            try {
+                outputStream.write(data.getBytes());
+                outputStream.flush();
+//                runOnUiThread(() -> showToast("데이터 전송: " + data));
+            } catch (IOException e) {
+//                runOnUiThread(() -> showToast("데이터 전송 실패"));
+                e.printStackTrace();
+            }
+        } else {
+            showToast("연결된 장치가 없습니다.");
+        }
+    }
+
+    private void closeSocket() {
+        try {
+            if (bluetoothSocket != null) bluetoothSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void showToast(String message) {
@@ -162,20 +230,21 @@ public class LoadingPageActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy() { // 로딩 페이지 파괴할 때 사용
         super.onDestroy();
-        if (isDiscovering) {
+        if (isDiscovering) { // 장치 검색이 진행 중인지 확인
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
-                bluetoothAdapter.cancelDiscovery();
+                bluetoothAdapter.cancelDiscovery(); // 검색 중단
             }
         }
-        unregisterReceiverSafely(bluetoothReceiver);
     }
 
+    // bluetooth 해지할 때 사용
     private void unregisterReceiverSafely(BroadcastReceiver receiver) {
         try {
             unregisterReceiver(receiver);
         } catch (IllegalArgumentException ignored) {
         }
     }
+
 }

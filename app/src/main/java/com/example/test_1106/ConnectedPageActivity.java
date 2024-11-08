@@ -1,5 +1,6 @@
 package com.example.test_1106;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,10 +11,11 @@ public class ConnectedPageActivity extends AppCompatActivity {
     private Button homeButton;
     private View backButton;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.connected_page);
 
         // View 연결
         homeButton = findViewById(R.id.homeButton);
