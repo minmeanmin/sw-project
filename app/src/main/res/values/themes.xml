@@ -1,0 +1,12 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Test_1106" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- 기존 색상 오버라이드가 적용되지 않도록 colorPrimary나 colorAccent를 기본값으로 설정 -->
+        <item name="colorPrimary">#FCFBF7</item> <!-- 기본 배경색을 원색과 맞추기 -->
+        <item name="colorPrimaryVariant">#FFFFFF</item>
+        <item name="colorAccent">#FFFFFF</item>
+        <item name="buttonStyle">@style/Widget.AppCompat.Button</item> <!-- 버튼에 기본 스타일 적용 -->
+    </style>
+
+    <style name="Theme.Test_1106" parent="Base.Theme.Test_1106" />
+</resources>
