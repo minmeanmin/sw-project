@@ -33,7 +33,6 @@ public class LoadingPageActivity extends AppCompatActivity {
     private String targetDeviceName;
     private BluetoothDevice targetDevice;
     private BluetoothSocket bluetoothSocket;
-    private InputStream inputStream;
     private OutputStream outputStream;
     private boolean isDiscovering = false;
 
@@ -181,7 +180,6 @@ public class LoadingPageActivity extends AppCompatActivity {
                 bluetoothSocket.connect();
 
                 // 스트림 초기화
-                inputStream = bluetoothSocket.getInputStream();
                 outputStream = bluetoothSocket.getOutputStream();
 
                 // UI 업데이트 및 데이터 전송
@@ -239,12 +237,12 @@ public class LoadingPageActivity extends AppCompatActivity {
         }
     }
 
-    // bluetooth 해지할 때 사용
-    private void unregisterReceiverSafely(BroadcastReceiver receiver) {
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException ignored) {
-        }
-    }
+//    // bluetooth 해지할 때 사용
+//    private void unregisterReceiverSafely(BroadcastReceiver receiver) {
+//        try {
+//            unregisterReceiver(receiver);
+//        } catch (IllegalArgumentException ignored) {
+//        }
+//    }
 
 }
