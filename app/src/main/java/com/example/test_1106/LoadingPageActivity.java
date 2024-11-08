@@ -21,14 +21,12 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
-import android.util.Log; // 로그 추가
-
 public class LoadingPageActivity extends AppCompatActivity {
     private static final int REQUEST_BLUETOOTH_PERMISSIONS = 1;
-    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // SPP UUID
+    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private BluetoothAdapter bluetoothAdapter;
     private String targetDeviceName;
-    private BluetoothDevice targetDevice; // 연결할 장치 객체 추가
+    private BluetoothDevice targetDevice;
     private boolean isDiscovering = false;
 
     @Override
@@ -37,160 +35,147 @@ public class LoadingPageActivity extends AppCompatActivity {
         setContentView(R.layout.loading_page);
 
         targetDeviceName = Objects.requireNonNull(getIntent().getStringExtra("TRAY_ID")).trim();
-        Toast.makeText(this, "장치 이름 수신: " + targetDeviceName, Toast.LENGTH_SHORT).show();
-
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            Toast.makeText(this, "블루투스를 지원하지 않는 기기입니다.", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
 
-        checkBluetoothPermissions();
+        if (bluetoothAdapter == null) {
+            showToast("이 기기는 블루투스를 지원하지 않습니다. 앱을 종료합니다.");
+            finish();
+        } else {
+            checkPermissionsAndRequest();
+        }
     }
 
-    private void checkBluetoothPermissions() {
-        Log.d("LoadingPageActivity", "checkBluetoothPermissions called");
+    private void checkPermissionsAndRequest() {
+        boolean bluetoothPermissions = hasPermissions(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN);
+        boolean locationPermission = hasPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Log.d("LoadingPageActivity", "Android 12 이상");
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                Log.d("LoadingPageActivity", "블루투스 권한 요청");
-                ActivityCompat.requestPermissions(this, new String[]{
-                        Manifest.permission.BLUETOOTH_CONNECT,
-                        Manifest.permission.BLUETOOTH_SCAN
-                }, REQUEST_BLUETOOTH_PERMISSIONS);
-            } else {
-                startBluetoothDiscovery();
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !bluetoothPermissions) {
+            requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN});
+        } else if (!locationPermission) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
         } else {
-            Log.d("LoadingPageActivity", "Android 11 이하");
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                Log.d("LoadingPageActivity", "위치 권한 요청");
-                ActivityCompat.requestPermissions(this, new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                }, REQUEST_BLUETOOTH_PERMISSIONS);
-            } else {
-                startBluetoothDiscovery();
+            startBluetoothDiscovery();
+        }
+    }
+
+    private boolean hasPermissions(String... permissions) {
+        for (String permission : permissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
             }
         }
+        return true;
+    }
+
+    private void requestPermissions(String[] permissions) {
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_BLUETOOTH_PERMISSIONS);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d("LoadingPageActivity", "onRequestPermissionsResult called");
-
         if (requestCode == REQUEST_BLUETOOTH_PERMISSIONS) {
-            boolean allPermissionsGranted = true;
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allPermissionsGranted = false;
-                    Log.d("LoadingPageActivity", "권한 거부됨: " + permissions[result]);
-                    break;
-                }
-            }
-            if (allPermissionsGranted) {
-                Log.d("LoadingPageActivity", "모든 권한 허용됨");
+            if (allPermissionsGranted(grantResults)) {
                 startBluetoothDiscovery();
             } else {
-                Toast.makeText(this, "Bluetooth와 위치 권한이 필요합니다. 앱 설정에서 권한을 허용해주세요.", Toast.LENGTH_LONG).show();
+                showToast("앱에서 Bluetooth와 위치 권한이 필요합니다. 설정에서 권한을 허용한 후 다시 시도해주세요.");
                 finish();
             }
         }
     }
 
+    private boolean allPermissionsGranted(int[] grantResults) {
+        for (int result : grantResults) {
+            if (result != PackageManager.PERMISSION_GRANTED) return false;
+        }
+        return true;
+    }
+
     private void startBluetoothDiscovery() {
-        if (isDiscovering) return;
-
-        Toast.makeText(this, "Bluetooth 검색 시작", Toast.LENGTH_SHORT).show();
-        Log.d("LoadingPageActivity", "Bluetooth 검색 시작");
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
-
-            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-            registerReceiver(bluetoothReceiver, filter);
-
-            bluetoothAdapter.startDiscovery();
+        if (!isDiscovering && hasPermissions(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)) {
             isDiscovering = true;
-            Log.d("LoadingPageActivity", "Bluetooth 장치 검색 시작");
-        } else {
-            Toast.makeText(this, "Bluetooth 권한 부족으로 검색 불가", Toast.LENGTH_SHORT).show();
+            registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+            registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
+                bluetoothAdapter.startDiscovery();
+                showToast("Bluetooth 장치 검색을 시작합니다...");
+            } else {
+                requestPermissions(new String[]{Manifest.permission.BLUETOOTH_SCAN});
+            }
         }
     }
 
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+            if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if (device != null && ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-                    if (device.getName() != null && device.getName().equals(targetDeviceName)) {
-                        Toast.makeText(LoadingPageActivity.this, "연결 가능한 장치를 찾았습니다: " + device.getName(), Toast.LENGTH_SHORT).show();
-                        targetDevice = device; // 장치 객체 저장
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                    if (device != null && targetDeviceName.equals(device.getName())) {
+                        targetDevice = device;
                         bluetoothAdapter.cancelDiscovery();
                         isDiscovering = false;
-                        connectToDevice(targetDevice); // 연결 메소드 호출
+                        showToast("목표 장치(" + device.getName() + ")를 찾았습니다. 연결을 시도합니다.");
+                        connectToDevice();
                     }
+                } else {
+                    requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT});
                 }
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
                 isDiscovering = false;
-                Toast.makeText(LoadingPageActivity.this, "장치 검색이 완료되었습니다. 목표 장치를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+                showToast("장치 검색을 완료했습니다. 목표 장치를 찾지 못했거나 연결이 실패했습니다. 다시 시도해 주세요.");
             }
         }
     };
 
-    private void connectToDevice(BluetoothDevice device) {
+    private void connectToDevice() {
         new Thread(() -> {
-            try {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    // 권한 요청
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.BLUETOOTH_CONNECT},
-                            REQUEST_BLUETOOTH_PERMISSIONS);
+            int retryCount = 0;
+            while (retryCount < 3) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                    try (BluetoothSocket socket = targetDevice.createRfcommSocketToServiceRecord(MY_UUID)) {
+                        bluetoothAdapter.cancelDiscovery();
+                        socket.connect();
+                        runOnUiThread(() -> showToast("목표 장치와 성공적으로 연결되었습니다!"));
+                        runOnUiThread(() -> goToNextPage(socket));
+                        return;
+                    } catch (IOException e) {
+                        retryCount++;
+                        if (retryCount >= 3) showToast("목표 장치와 연결할 수 없습니다. Bluetooth를 확인한 후 다시 시도해 주세요.");
+                    }
+                } else {
+                    requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT});
                     return;
                 }
-
-                BluetoothSocket socket = device.createRfcommSocketToServiceRecord(MY_UUID);
-                socket.connect(); // 연결 시도
-
-                // 연결 성공 시
-                runOnUiThread(() -> {
-                    Toast.makeText(LoadingPageActivity.this, "장치에 연결되었습니다!", Toast.LENGTH_SHORT).show();
-                    goToNextPage(); // 연결 후 다음 페이지로 이동
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(LoadingPageActivity.this, "장치 연결 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
         }).start();
     }
 
-    private void goToNextPage() {
+    private void goToNextPage(BluetoothSocket socket) {
         Intent intent = new Intent(LoadingPageActivity.this, ConnectedPageActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (isDiscovering) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                return;
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
+                bluetoothAdapter.cancelDiscovery();
             }
-            bluetoothAdapter.cancelDiscovery();
         }
+        unregisterReceiverSafely(bluetoothReceiver);
+    }
+
+    private void unregisterReceiverSafely(BroadcastReceiver receiver) {
         try {
-            unregisterReceiver(bluetoothReceiver);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException ignored) {
         }
     }
 }
