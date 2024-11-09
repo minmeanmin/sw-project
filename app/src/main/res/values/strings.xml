@@ -44,4 +44,6 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="title_activity_main2">MainActivity2</string>
+    <string name="selectButton">선택</string>
+    <string name="guideText">등록된 트레이를 선택해주세요.</string>
 </resources>
