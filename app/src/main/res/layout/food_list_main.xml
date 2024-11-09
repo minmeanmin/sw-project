@@ -103,7 +103,8 @@
                     android:padding="3dp"
                     android:text="선택"
                     android:textAlignment="center"
-                    android:textColor="#000000" />
+                    android:textColor="#000000"
+                    android:tag="tray1752" /> <!-- tag 속성에 숨긴 값 설정 -->
             </LinearLayout>
 
             <!-- 트레이와 선택 버튼 (2번째부터 5번째까지 반복) -->

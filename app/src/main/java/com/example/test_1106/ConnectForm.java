@@ -18,7 +18,7 @@ public class ConnectForm extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.connect_form);
 
         trayIdEditText = findViewById(R.id.trayIdEditText);
         registerButton = findViewById(R.id.registerButton);
