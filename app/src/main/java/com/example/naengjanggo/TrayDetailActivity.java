@@ -25,7 +25,7 @@ public class TrayDetailActivity extends AppCompatActivity {
         }
 
         // Initialize navigation buttons
-        ImageButton backButton = findViewById(R.id.backButton);
+        ImageButton backButton = findViewById(R.id.backButtonInFoodListPage);
 
         // Initialize grid items
         CardView kimchiCard = findViewById(R.id.kimchiCard);

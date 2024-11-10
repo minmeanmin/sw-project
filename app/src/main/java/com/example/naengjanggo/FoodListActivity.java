@@ -15,6 +15,10 @@ public class FoodListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.food_list_main);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         View backButton = findViewById(R.id.backButtonInFoodListPage);
         Button tray1Button = findViewById(R.id.tray1selectButtonInFoodListPage);
         Button tray2Button = findViewById(R.id.tray2selectButtonInFoodListPage);
