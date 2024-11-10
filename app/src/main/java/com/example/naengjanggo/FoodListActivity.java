@@ -30,10 +30,11 @@ public class FoodListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // tag에 있는 tray 이름(=bluetooth 이름) 읽기
-                String trayId = (String) v.getTag(); // TODO: bluetooth 이름 tray1752로 바꾸기
-                Intent intent = new Intent(FoodListActivity.this, LoadingPageActivity.class); // TODO: 나중에 민주 화면으로 이동하도록
+                String trayId = (String) v.getTag();
+                Intent intent = new Intent(FoodListActivity.this, TrayDetailActivity.class);
                 intent.putExtra("TRAY_ID", trayId);
                 Toast.makeText(FoodListActivity.this, "선택한 트레이: " + trayId, Toast.LENGTH_SHORT).show();
+                startActivity(intent);
             }
         });
 

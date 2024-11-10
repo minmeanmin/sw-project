@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAF9F9"
+    android:background="#FCFBF7"
     android:padding="16dp">
 
     <!-- 뒤로 가기 버튼 -->
