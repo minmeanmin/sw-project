@@ -9,10 +9,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -100,10 +103,23 @@ public class FoodDetailActivity extends AppCompatActivity {
                 }
                 // Highlight selected card
                 card.setCardBackgroundColor(getResources().getColor(R.color.selected_color));
+                sendCommandToMotor('1');
             });
         }
     }
 
+    private void sendCommandToMotor(char command) {
+        OutputStream outputStream = BluetoothConnectionManager.getInstance().getOutputStream();
+        if (outputStream != null) {
+            try {
+                outputStream.write(command);
+                Toast.makeText(this, "명령 전송됨: " + command, Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Log.e("Bluetooth", "명령 전송 실패", e);
+                Toast.makeText(this, "명령 전송에 실패했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
     private void setEditMode(boolean editMode) {
         isEditMode = editMode;
         productNameText.setVisibility(editMode ? View.GONE : View.VISIBLE);
