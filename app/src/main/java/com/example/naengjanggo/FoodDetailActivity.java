@@ -44,7 +44,7 @@ public class FoodDetailActivity extends AppCompatActivity {
         }
 
         // Initialize views
-        ImageButton backButton = findViewById(R.id.backButton);
+        ImageButton backButton = findViewById(R.id.backButtonInFoodListPage);
         productNameText = findViewById(R.id.productNameText);
         expirationDateText = findViewById(R.id.expirationDateText);
         memoText = findViewById(R.id.memoText);

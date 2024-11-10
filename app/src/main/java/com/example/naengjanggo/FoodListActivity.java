@@ -39,9 +39,12 @@ public class FoodListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.food_list_main);
-
         targetDeviceName = "tray1752";
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
 
         View backButton = findViewById(R.id.backButtonInFoodListPage);
         Button tray1Button = findViewById(R.id.tray1selectButtonInFoodListPage);
