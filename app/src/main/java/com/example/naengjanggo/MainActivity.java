@@ -64,6 +64,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }, COLOR_CHANGE_DURATION + ANIMATION_DURATION);
 
+        button1.setOnClickListener(v -> {
+                    Intent intent = new Intent(MainActivity.this, FoodListActivity.class);
+                    startActivity(intent);
+                }
+        );
+
+        button2.setOnClickListener(v -> {
+                    Intent intent = new Intent(MainActivity.this, ConnectForm.class);
+                    startActivity(intent);
+                }
+        );
+
         //나중에 설명서 페이지 만들어서 연결하기
         button3.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity.this, DescriptionActivity.class);

@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+
 public class TrayDetailActivity extends AppCompatActivity {
     private CardView selectedCard = null;
     private String selectedProduct = null;
@@ -36,7 +37,13 @@ public class TrayDetailActivity extends AppCompatActivity {
         Button nextButton = findViewById(R.id.nextButton);
 
         // Add click listeners
-        backButton.setOnClickListener(v -> onBackPressed());
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TrayDetailActivity.this, FoodListActivity.class);
+                startActivity(intent);
+            }
+        });
 
         View.OnClickListener cardClickListener = v -> {
             if (selectedCard != null) {
