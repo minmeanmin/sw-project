@@ -55,7 +55,13 @@ public class FoodListActivity extends AppCompatActivity {
 
 
         // 뒤로 가기 버튼 이벤트
-        backButton.setOnClickListener(v -> finish());
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FoodListActivity.this, Main2Activity.class);
+                startActivity(intent);
+            }
+        });
 
 //        tray1Button.setTag(""); // DB에서 목록 불어와서 태그값 등록할 때 사용
         tray1Button.setOnClickListener(new View.OnClickListener() {

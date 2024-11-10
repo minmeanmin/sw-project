@@ -1,6 +1,7 @@
 package com.example.naengjanggo;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -104,6 +105,8 @@ public class FoodDetailActivity extends AppCompatActivity {
                 // Highlight selected card
                 card.setCardBackgroundColor(getResources().getColor(R.color.selected_color));
                 sendCommandToMotor('1');
+                Intent intent = new Intent(FoodDetailActivity.this, FoodListActivity.class);
+                startActivity(intent);
             });
         }
     }
@@ -113,10 +116,10 @@ public class FoodDetailActivity extends AppCompatActivity {
         if (outputStream != null) {
             try {
                 outputStream.write(command);
-                Toast.makeText(this, "명령 전송됨: " + command, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "이동중... ", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
-                Log.e("Bluetooth", "명령 전송 실패", e);
-                Toast.makeText(this, "명령 전송에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                Log.e("Bluetooth", "이동 실패", e);
+                Toast.makeText(this, "이동 실패.", Toast.LENGTH_SHORT).show();
             }
         }
     }

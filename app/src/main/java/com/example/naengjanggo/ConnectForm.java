@@ -24,7 +24,13 @@ public class ConnectForm extends AppCompatActivity {
         registerButton = findViewById(R.id.registerButton);
         backButton = findViewById(R.id.backButton);
 
-        backButton.setOnClickListener(v -> finish());
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ConnectForm.this, Main2Activity.class);
+                startActivity(intent);
+            }
+        });
 
         registerButton.setOnClickListener(v -> {
             String trayId = trayIdEditText.getText().toString();

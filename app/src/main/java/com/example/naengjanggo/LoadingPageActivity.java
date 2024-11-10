@@ -54,7 +54,8 @@ public class LoadingPageActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish(); // 현재 Activity를 종료하고 이전 화면으로 돌아감
+                Intent intent = new Intent(LoadingPageActivity.this, ConnectForm.class);
+                startActivity(intent);
             }
         });
     }
