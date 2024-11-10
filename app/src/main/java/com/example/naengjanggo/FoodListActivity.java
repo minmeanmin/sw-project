@@ -2,75 +2,40 @@ package com.example.naengjanggo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 
 public class FoodListActivity extends AppCompatActivity {
-    private CardView selectedCard = null;
-    private String selectedProduct = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_product_list);
+        setContentView(R.layout.food_list_main);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
+        View backButton = findViewById(R.id.backButtonInFoodListPage);
+        Button tray1Button = findViewById(R.id.tray1selectButtonInFoodListPage);
+        Button tray2Button = findViewById(R.id.tray2selectButtonInFoodListPage);
+        Button tray3Button = findViewById(R.id.tray3selectButtonInFoodListPage);
+        Button tray4Button = findViewById(R.id.tray4selectButtonInFoodListPage);
+        Button tray5Button = findViewById(R.id.tray5selectButtonInFoodListPage);
 
-        // Initialize navigation buttons
-        ImageButton backButton = findViewById(R.id.backButton);
+        // 뒤로 가기 버튼 이벤트
+        backButton.setOnClickListener(v -> finish());
 
-        // Initialize grid items
-        CardView kimchiCard = findViewById(R.id.kimchiCard);
-        CardView jikobaCard = findViewById(R.id.jikobaCard);
-        CardView eggsCard = findViewById(R.id.eggsCard);
-        CardView milkCard = findViewById(R.id.milkCard);
-
-        // Initialize next button
-        Button nextButton = findViewById(R.id.nextButton);
-
-        // Add click listeners
-        backButton.setOnClickListener(v -> onBackPressed());
-
-        View.OnClickListener cardClickListener = v -> {
-            if (selectedCard != null) {
-                selectedCard.setCardBackgroundColor(getResources().getColor(R.color.white));
-            }
-            selectedCard = (CardView) v;
-            selectedCard.setCardBackgroundColor(getResources().getColor(R.color.selected_color));
-            selectedProduct = getProductName(selectedCard);
-
-        };
-
-        kimchiCard.setOnClickListener(cardClickListener);
-        jikobaCard.setOnClickListener(cardClickListener);
-        eggsCard.setOnClickListener(cardClickListener);
-        milkCard.setOnClickListener(cardClickListener);
-
-        nextButton.setOnClickListener(v -> {
-            if (selectedProduct != null) {
-                Log.d("FoodListActivity", "Selected Product: " + selectedProduct);
-                Intent intent = new Intent(FoodListActivity.this, FoodDetailActivity.class);
-                intent.putExtra("PRODUCT_NAME", selectedProduct);
-                startActivity(intent);
-            } else {
-                Toast.makeText(FoodListActivity.this, "제품을 선택해주세요.", Toast.LENGTH_SHORT).show();
+//        tray1Button.setTag(""); // DB에서 목록 불어와서 태그값 등록할 때 사용
+        tray1Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // tag에 있는 tray 이름(=bluetooth 이름) 읽기
+                String trayId = (String) v.getTag(); // TODO: bluetooth 이름 tray1752로 바꾸기
+                Intent intent = new Intent(FoodListActivity.this, LoadingPageActivity.class); // TODO: 나중에 민주 화면으로 이동하도록
+                intent.putExtra("TRAY_ID", trayId);
+                Toast.makeText(FoodListActivity.this, "선택한 트레이: " + trayId, Toast.LENGTH_SHORT).show();
             }
         });
-    }
 
-    private String getProductName(CardView cardView) {
-        int id = cardView.getId();
-        if (id == R.id.kimchiCard) return "김치";
-        if (id == R.id.jikobaCard) return "지코바";
-        if (id == R.id.eggsCard) return "계란";
-        if (id == R.id.milkCard) return "우유";
-        return "";
     }
 }

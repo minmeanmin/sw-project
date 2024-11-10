@@ -1,0 +1,19 @@
+<!-- res/layout/activity_bluetooth_selection.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="연결할 Bluetooth 장치를 선택하세요."
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"/>
+
+    <ListView
+        android:id="@+id/bluetoothDeviceList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

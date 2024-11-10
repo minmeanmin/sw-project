@@ -1,8 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Food Selection</string>
-    <string name="back_button">뒤로가기</string>
-    <string name="forward_button">앞으로가기</string>
+    <string name="app_name">Test_1106</string>
+    <string name="back_button">뒤로 가기</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="selectButton">선택</string>
+    <string name="guideText">등록된 트레이를 선택해주세요.</string>
     <string name="product_detail_title">해당 품목의 유통기한 및 위치설정</string>
     <string name="product_name">품목명</string>
     <string name="expiration_date">유통기한</string>
@@ -11,5 +17,4 @@
     <string name="location_setting">위치설정</string>
     <string name="edit">편집</string>
     <string name="save">저장</string>
-    <string name="next">다음</string>
 </resources>

@@ -1,0 +1,227 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAF9F9"
+    android:padding="16dp">
+
+    <!-- 뒤로 가기 버튼 -->
+    <ImageButton
+        android:id="@+id/backButtonInFoodListPage"
+        android:layout_width="51dp"
+        android:layout_height="51dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="49dp"
+        android:background="@drawable/shape_for_circle_button"
+        android:contentDescription="@string/back_button"
+        android:gravity="center_horizontal|center_vertical"
+        android:src="@drawable/ic_back_arrow"
+        android:elevation="8dp"/>
+
+    <!-- 헤더바 -->
+    <View
+        android:id="@+id/headerBarInFoodListPage"
+        android:layout_width="380dp"
+        android:layout_height="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="97dp"
+        android:layout_centerHorizontal="true"
+        android:background="#FF5414" />
+
+    <!-- 안내 문구 -->
+    <TextView
+        android:id="@+id/guideTextInFoodListPage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/backButtonInFoodListPage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="-52dp"
+        android:layout_marginTop="70dp"
+        android:layout_toEndOf="@id/backButtonInFoodListPage"
+        android:text="@string/guideText"
+        android:textColor="#000000"
+        android:textSize="23sp"/>
+
+    <!-- 내용 컨테이너 -->
+    <RelativeLayout
+        android:id="@+id/contentContainerInFoodListPage"
+        android:layout_width="382dp"
+        android:layout_height="450dp"
+        android:layout_below="@id/headerBarInFoodListPage"
+        android:layout_marginTop="60dp"
+        android:layout_centerInParent="true"
+        android:background="#FFFFFF">
+
+        <!-- PNG 파일 추가 (냉장고 이미지) -->
+        <ImageView
+            android:id="@+id/refrigeratorImageInFoodListPage"
+            android:layout_width="210dp"
+            android:layout_height="400dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/refrigerator" />
+
+        <!-- 트레이와 버튼을 담을 컨테이너 -->
+        <LinearLayout
+            android:id="@+id/trayContainerInFoodListPage"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:orientation="vertical"
+            android:layout_toEndOf="@id/refrigeratorImageInFoodListPage"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="30dp">
+
+            <!-- 트레이와 선택 버튼 (첫 번째) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="16dp">
+
+                <!-- 상태바 -->
+                <View
+                    android:id="@+id/tray1InFoodListPage"
+                    android:layout_width="152dp"
+                    android:layout_height="10dp"
+                    android:layout_marginTop="35dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="#FF5414" />
+
+                <!-- 선택 버튼 -->
+                <Button
+                    android:id="@+id/tray1selectButtonInFoodListPage"
+                    android:layout_width="154dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/button_background"
+                    android:layout_marginStart="15dp"
+                    android:padding="3dp"
+                    android:text="선택"
+                    android:textAlignment="center"
+                    android:textColor="#000000"
+                    android:tag="tray1752" /> <!-- tag 속성에 숨긴 값 설정 -->
+            </LinearLayout>
+
+            <!-- 트레이와 선택 버튼 (2번째부터 5번째까지 반복) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="16dp">
+
+                <View
+                    android:id="@+id/tray2InFoodListPage"
+                    android:layout_width="152dp"
+                    android:layout_height="10dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="#FFAF3E" />
+
+                <Button
+                    android:id="@+id/tray2selectButtonInFoodListPage"
+                    android:layout_width="154dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/button_background"
+                    android:layout_marginStart="15dp"
+                    android:padding="3dp"
+                    android:text="선택"
+                    android:textAlignment="center"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="16dp">
+
+                <View
+                    android:id="@+id/tray3InFoodListPage"
+                    android:layout_width="152dp"
+                    android:layout_height="10dp"
+                    android:layout_marginTop="36dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="#319FFF" />
+
+                <Button
+                    android:id="@+id/tray3selectButtonInFoodListPage"
+                    android:layout_width="154dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/button_background"
+                    android:layout_marginStart="15dp"
+                    android:padding="3dp"
+                    android:text="선택"
+                    android:textAlignment="center"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp">
+
+                <View
+                    android:id="@+id/tray4InFoodListPage"
+                    android:layout_width="152dp"
+                    android:layout_height="10dp"
+                    android:layout_marginTop="38dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="#3E41FF" />
+
+                <Button
+                    android:id="@+id/tray4selectButtonInFoodListPage"
+                    android:layout_width="154dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/button_background"
+                    android:layout_marginStart="15dp"
+                    android:padding="3dp"
+                    android:text="선택"
+                    android:textAlignment="center"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="15dp">
+
+                <View
+                    android:id="@+id/tray5InFoodListPage"
+                    android:layout_width="152dp"
+                    android:layout_height="10dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="#FF292C" />
+
+                <Button
+                    android:id="@+id/tray5selectButtonInFoodListPage"
+                    android:layout_width="154dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/button_background"
+                    android:layout_marginStart="15dp"
+                    android:padding="3dp"
+                    android:text="선택"
+                    android:textAlignment="center"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

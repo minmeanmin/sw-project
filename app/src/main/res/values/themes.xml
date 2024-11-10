@@ -1,9 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.NaengJangGo" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+
+    <style name="Theme.NaengJangGo" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Base application theme. -->
+        <!-- 기존 색상 오버라이드가 적용되지 않도록 colorPrimary나 colorAccent를 기본값으로 설정 -->
+        <item name="colorPrimary">#FCFBF7</item> <!-- 기본 배경색을 원색과 맞추기 -->
+        <item name="colorPrimaryVariant">#FFFFFF</item>
+        <item name="colorAccent">#FFFFFF</item>
+        <item name="buttonStyle">@style/Widget.AppCompat.Button</item> <!-- 버튼에 기본 스타일 적용 -->
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -13,8 +17,8 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
-    <style name="SplashTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-    </style>
+
+    <style name="Theme.Test_1106" parent="Base.Theme.Test_1106" />
+
+
 </resources>
